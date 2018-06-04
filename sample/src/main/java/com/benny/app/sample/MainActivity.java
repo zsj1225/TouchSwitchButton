@@ -1,9 +1,14 @@
 package com.benny.app.sample;
 
+import android.animation.ObjectAnimator;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.PathInterpolator;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.benny.library.tsbutton.TouchSwitchButton;
@@ -27,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
             return 500;
         }
     };
+    private ImageView mTsCenterPoint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +49,20 @@ public class MainActivity extends AppCompatActivity {
         twoWay.setOnToLeftSelectedListener(onToLeft);
         twoWay.setOnToRightSelectedListener(onToRight);
 //        twoWay.setRightImage(R.drawable.ts_volte);
+//
+//        mTsCenterPoint = (ImageView) findViewById(R.id.ts_center_point);
+//        mTsCenterPoint.setOnClickListener(new View.OnClickListener() {
+//            public ObjectAnimator mTouchAlpha;
+//
+//            @Override
+//            public void onClick(View v) {
+//                mTouchAlpha = ObjectAnimator.ofFloat(mTsCenterPoint, "alpha", 1.0f, 0.0f).setDuration(1000);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                    mTouchAlpha.setInterpolator(new PathInterpolator(0.35f,0.0f,0.2f,1f));
+//                }
+//                mTouchAlpha.start();
+//            }
+//        });
     }
 
     @Override

@@ -1,4 +1,5 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,6 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="#aa688e93"
     tools:context=".MainActivity">
 
     <TextView
@@ -59,33 +61,16 @@
         android:text="To Right Sample" />
 
     <com.benny.library.tsbutton.TouchSwitchButton
+        android:visibility="visible"
         android:id="@+id/two_way"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
         app:tsb_direction="TwoWay"
         app:tsb_radius="10000dp"
-        app:tsb_startColor="@android:color/holo_purple"
         app:tsb_thumbId="@+id/thumb"
         app:tsb_toLeftEndColor="@android:color/holo_green_light"
         app:tsb_toRightEndColor="@android:color/holo_orange_light">
-
-<!--
-        <ImageView
-            android:id="@+id/thumb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/ic_launcher" />
--->
-
-<!--        <ImageView
-            android:id="@+id/ts_call_left"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ts_hangup"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="35dp"
-            />-->
 
 
         <com.benny.library.tsbutton.RingView
@@ -94,18 +79,6 @@
             android:layout_height="wrap_content"
             app:ring_color="@color/ts_transparent_white"
             app:ring_width="1dp"/>
-
-
-
-<!--        <ImageView
-            android:id="@+id/ts_call_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ts_answer"
-            android:layout_alignParentRight="true"
-            android:layout_marginEnd="35dp"
-            android:layout_centerVertical="true"
-            />-->
 
 
     </com.benny.library.tsbutton.TouchSwitchButton>

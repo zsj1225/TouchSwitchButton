@@ -1,8 +1,10 @@
 package com.benny.library.tsbutton;
 
+import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -12,11 +14,16 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.PathInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by benny on 17/11/2016.
@@ -50,6 +57,14 @@ public class TouchSwitchButton extends RelativeLayout {
     private ImageView mImageViewRight;
     private int mImageViewRightWidth;
     private int mImageViewLeftWidth;
+    private ImageView mIvCenterPoint;
+    private AnimatorSet mCenterPointAnimSet;
+    private ImageView mIvLeftPointOne;
+    private AnimatorSet LeftPointOneAnimSet;
+    private ImageView mIvLeftPointTwo;
+    private List<AnimatorSet> mLeftRightAnimSets = new ArrayList<>();
+    private ImageView mIvRightPointOne;
+    private ImageView mIvRightPointTwo;
 
     public TouchSwitchButton(Context context) {
         this(context, null);
@@ -107,6 +122,23 @@ public class TouchSwitchButton extends RelativeLayout {
         }
         seLeftImage(R.drawable.ts_hangup);
         setRightImage(R.drawable.ts_answer);
+        mIvLeftPointOne = getPoint(R.drawable.ts_left_point_one);
+        mIvLeftPointTwo =  getPoint(R.drawable.ts_left_point_two);
+        mIvCenterPoint = getPoint(R.drawable.ts_center_point);
+        mIvRightPointOne = getPoint(R.drawable.ts_right_point_one);
+        mIvRightPointTwo = getPoint(R.drawable.ts_right_point_two);
+
+        playPointAni();
+    }
+
+    public ImageView getPoint(int resId){
+        ImageView point = new ImageView(getContext());
+        point.setImageResource(resId);
+        RelativeLayout.LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        addView(point, layoutParams);
+        return point;
     }
 
 
@@ -282,6 +314,113 @@ public class TouchSwitchButton extends RelativeLayout {
 
         mImageViewRightWidth = mImageViewRight.getMeasuredWidth();
         mImageViewLeftWidth = mImageViewLeft.getMeasuredWidth();
+
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void playCenterPointAni() {
+        mCenterPointAnimSet = new AnimatorSet();
+        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(mIvCenterPoint, "scaleY", 1.0f, 0.8f);
+        scaleYAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        scaleYAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        scaleYAnimator.setDuration(650);
+
+        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(mIvCenterPoint, "scaleX", 1.0f, 0.8f);
+        scaleXAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        scaleXAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        scaleXAnimator.setDuration(650);
+
+        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(mIvCenterPoint, "alpha", 1, 0.4f);
+        alphaAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        alphaAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        alphaAnimator.setDuration(650);
+
+        mCenterPointAnimSet.play(scaleYAnimator).with(scaleXAnimator).with(alphaAnimator);
+        mCenterPointAnimSet.setInterpolator(new PathInterpolator(0.35f, 0.0f, 0.2f, 1f));
+        mCenterPointAnimSet.start();
+    }
+
+    /**
+     * @param iv 作用于那个ImageView
+     * @param translationX 负数：左移 正数：右移
+     * @param startDelay 延时多久开始动画
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void playLeftPointAni(ImageView iv, int translationX, long startDelay) {
+        AnimatorSet leftRightAnimSet = new AnimatorSet();
+        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(iv, "scaleY", 1.0f, 1.75f);
+        scaleYAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        scaleYAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        scaleYAnimator.setDuration(650);
+        scaleYAnimator.setStartDelay(startDelay);
+        scaleYAnimator.setInterpolator(new PathInterpolator(0.35f, 0.0f, 0.2f, 1f));
+
+        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(iv, "scaleX", 1.0f, 1.75f);
+        scaleXAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        scaleXAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        scaleXAnimator.setDuration(650);
+        scaleXAnimator.setStartDelay(startDelay);
+        scaleXAnimator.setInterpolator(new PathInterpolator(0.35f, 0.0f, 0.2f, 1f));
+
+        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(iv, "alpha", 0f, 1f);
+        alphaAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        alphaAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        alphaAnimator.setDuration(650);
+        alphaAnimator.setStartDelay(startDelay);
+        alphaAnimator.setInterpolator(new PathInterpolator(0.35f, 0.0f, 0.2f, 1f));
+
+        ObjectAnimator translationXAnimator = ObjectAnimator.ofFloat(iv, "translationX",
+                0,  dip2px(getContext(),translationX));
+        translationXAnimator.setDuration(1300);
+        translationXAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        translationXAnimator.setRepeatMode(ValueAnimator.RESTART);
+        translationXAnimator.setInterpolator(new PathInterpolator(0.3f, 0.0f, 0.4f, 1f));
+        translationXAnimator.setStartDelay(startDelay);
+
+        leftRightAnimSet.play(scaleYAnimator).with(scaleXAnimator).with(alphaAnimator).with(translationXAnimator);
+        leftRightAnimSet.start();
+
+        mLeftRightAnimSets.add(leftRightAnimSet);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void playLeftPointOneAni() {
+        LeftPointOneAnimSet = new AnimatorSet();
+        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(mIvLeftPointOne, "scaleY", 1.0f, 1.75f);
+        scaleYAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        scaleYAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        scaleYAnimator.setDuration(650);
+        scaleYAnimator.setInterpolator(new PathInterpolator(0.35f, 0.0f, 0.2f, 1f));
+
+        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(mIvLeftPointOne, "scaleX", 1.0f, 1.75f);
+        scaleXAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        scaleXAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        scaleXAnimator.setDuration(650);
+        scaleXAnimator.setInterpolator(new PathInterpolator(0.35f, 0.0f, 0.2f, 1f));
+
+        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(mIvLeftPointOne, "alpha", 0f, 1f);
+        alphaAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        alphaAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        alphaAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float animatedValue = (float) animation.getAnimatedValue();
+                Log.d(TAG, "onAnimationUpdate: animatedValue = "+animatedValue);
+            }
+        });
+        alphaAnimator.setDuration(650);
+        alphaAnimator.setInterpolator(new PathInterpolator(0.35f, 0.0f, 0.2f, 1f));
+
+        ObjectAnimator translationXAnimator = ObjectAnimator.ofFloat(mIvLeftPointOne, "translationX",
+                0,  dip2px(getContext(),-110));
+        translationXAnimator.setDuration(1300);
+        translationXAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        translationXAnimator.setRepeatMode(ValueAnimator.RESTART);
+        translationXAnimator.setInterpolator(new PathInterpolator(0.3f, 0.0f, 0.4f, 1f));
+
+        LeftPointOneAnimSet.play(scaleYAnimator).with(scaleXAnimator).with(alphaAnimator).with(translationXAnimator);
+        LeftPointOneAnimSet.start();
     }
 
     public interface OnActionSelectedListener {
@@ -343,8 +482,10 @@ public class TouchSwitchButton extends RelativeLayout {
                     initialTouchX = event.getRawX();
                     //
                     touchZoom();
+                    cancelAniSet();
                     return true;
                 case MotionEvent.ACTION_UP:
+                    playPointAni();
                     //
                     touchZoomOut(mTouchZoomValue, mTouchZoomTime);
                     requestDisallowInterceptTouchEvent(false);
@@ -416,6 +557,50 @@ public class TouchSwitchButton extends RelativeLayout {
             }, delay);
         }
 
+    }
+
+
+    private void playPointAni(){
+        mIvCenterPoint.setVisibility(VISIBLE);
+        mIvLeftPointOne.setVisibility(VISIBLE);
+        mIvLeftPointTwo.setVisibility(VISIBLE);
+        mIvRightPointOne.setVisibility(VISIBLE);
+        mIvRightPointTwo.setVisibility(VISIBLE);
+
+        playCenterPointAni();
+        playLeftPointAni(mIvLeftPointOne,-110,0);
+        playLeftPointAni(mIvLeftPointTwo,-110,200);
+        playLeftPointAni(mIvRightPointOne,110,0);
+        playLeftPointAni(mIvRightPointTwo,110,200);
+    }
+
+    private void cancelAniSet() {
+        for (AnimatorSet leftRightAnimSet : mLeftRightAnimSets) {
+            leftRightAnimSet.cancel();
+        }
+        mCenterPointAnimSet.cancel();
+
+        mIvCenterPoint.setVisibility(GONE);
+        mIvLeftPointOne.setVisibility(GONE);
+        mIvLeftPointOne.setScaleX(1);
+        mIvLeftPointOne.setScaleY(1);
+        mIvLeftPointOne.setTranslationX(0);
+
+
+        mIvLeftPointTwo.setVisibility(GONE);
+        mIvLeftPointTwo.setScaleX(1);
+        mIvLeftPointTwo.setScaleY(1);
+        mIvLeftPointTwo.setTranslationX(0);
+
+        mIvRightPointOne.setVisibility(GONE);
+        mIvRightPointOne.setScaleX(1);
+        mIvRightPointOne.setScaleY(1);
+        mIvRightPointOne.setTranslationX(0);
+
+        mIvRightPointTwo.setVisibility(GONE);
+        mIvRightPointTwo.setScaleX(1);
+        mIvRightPointTwo.setScaleY(1);
+        mIvRightPointTwo.setTranslationX(0);
     }
 
 
