@@ -578,6 +578,7 @@ public class TouchSwitchButton extends RelativeLayout {
         for (AnimatorSet leftRightAnimSet : mLeftRightAnimSets) {
             leftRightAnimSet.cancel();
         }
+
         mCenterPointAnimSet.cancel();
 
         mIvCenterPoint.setVisibility(GONE);
