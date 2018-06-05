@@ -135,9 +135,7 @@ public class TouchSwitchButton extends RelativeLayout {
         mIvCenterPoint = getPoint(R.drawable.ts_center_point);
         mIvRightPointOne = getPoint(R.drawable.ts_right_point_one);
         mIvRightPointTwo = getPoint(R.drawable.ts_right_point_two);
-        //TODO
-//        playPointAni();
-
+        playPointAni();
     }
 
     public ImageView getPoint(int resId){
