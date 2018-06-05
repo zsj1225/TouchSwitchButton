@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ts_transparent_white">#6fff</color>
+    <color name="ts_call_right">#2BD92B</color>
+    <color name="ts_call_left">#FF3333</color>
 </resources>
