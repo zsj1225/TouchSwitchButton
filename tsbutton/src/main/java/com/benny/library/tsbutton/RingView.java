@@ -31,8 +31,8 @@ public class RingView extends View {
         array.recycle();
 
         View v = View.inflate(context, R.layout.item, null);
-        Button btn_change_color = (Button) v.findViewById(R.id.btn_change_color);
-        btn_change_color.setOnClickListener(new OnClickListener() {
+        Button btnChangeColor = (Button) v.findViewById(R.id.btn_change_color);
+        btnChangeColor.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 setColor();
@@ -92,9 +92,10 @@ public class RingView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        int cx = getMeasuredWidth() / 2;    //使用getMeasuredWidth 可以获得在onMeasure方法中新计算的宽度
+        int cx = getMeasuredWidth() / 2;
         int cy = getMeasuredHeight() / 2;
-        canvas.drawCircle(cx, cy, 100, mPaint); //该方法中的四个参数，前两个表示圆心的x，y的坐标。这两个值表示的是相对于该View中的位置，与其他view的位置无关。
+        int radius = (getMeasuredWidth() - dip2px(getContext(),1))/2;
+        canvas.drawCircle(cx, cy, radius, mPaint);
 
     }
 
@@ -108,7 +109,7 @@ public class RingView extends View {
         } else {
             height = width;
         }
-        setMeasuredDimension(width, height);  //将新计算的宽高测量值进行存储,否则不生效
+        setMeasuredDimension(width, height);
     }
 
     /**
@@ -130,18 +131,14 @@ public class RingView extends View {
         int mode = MeasureSpec.getMode(measureSpec);
 
         switch (mode) {
-            case MeasureSpec.UNSPECIFIED: // 没有指定大小，设置默认大小.
+            case MeasureSpec.UNSPECIFIED:
                 mySize = defaultSize;
                 break;
-            case MeasureSpec.EXACTLY:      // 如果布局中设置的值大于默认值，则使用布局中设置的值，对应match_parent和固定值
-                if (size > defaultSize) {
-                    mySize = size;
-                }
+            case MeasureSpec.EXACTLY:
+                mySize = size;
                 break;
-            case MeasureSpec.AT_MOST:     // 如果测量模式中的值大于默认值，取默认值，对应wrap_content
-                if (size > defaultSize) {
-                    mySize = defaultSize;
-                }
+            case MeasureSpec.AT_MOST:
+                mySize = defaultSize;
                 break;
             default:
                 break;

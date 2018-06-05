@@ -64,7 +64,7 @@
         android:visibility="visible"
         android:id="@+id/two_way"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="110dp"
         android:padding="5dp"
         app:tsb_direction="TwoWay"
         app:tsb_radius="10000dp"
@@ -75,14 +75,14 @@
 
         <com.benny.library.tsbutton.RingView
             android:id="@+id/thumb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="73dp"
+            android:layout_height="73dp"
+            android:layout_centerVertical="true"
             app:ring_color="@color/ts_transparent_white"
             app:ring_width="1dp"/>
 
 
     </com.benny.library.tsbutton.TouchSwitchButton>
-
 
 
 </LinearLayout>

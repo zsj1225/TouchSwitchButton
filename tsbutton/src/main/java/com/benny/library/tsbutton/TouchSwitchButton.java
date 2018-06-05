@@ -1,5 +1,6 @@
 package com.benny.library.tsbutton;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
@@ -51,8 +52,8 @@ public class TouchSwitchButton extends RelativeLayout {
     private ObjectAnimator mTouchZoomOutScaleY;
     private ObjectAnimator mTouchZoomOutScaleX;
 
-    private float mTouchZoomValue = 1.2f;
-    private long mTouchZoomTime = 200;
+    private float mTouchZoomValue = 1.25f;
+    private long mTouchZoomTime = 100;
     private ImageView mImageViewLeft;
     private ImageView mImageViewRight;
     private int mImageViewRightWidth;
@@ -65,6 +66,8 @@ public class TouchSwitchButton extends RelativeLayout {
     private List<AnimatorSet> mLeftRightAnimSets = new ArrayList<>();
     private ImageView mIvRightPointOne;
     private ImageView mIvRightPointTwo;
+    private AnimatorSet mAlphaAnimatorSet;
+    private AnimatorSet mTouchZoomAnimatorSet;
 
     public TouchSwitchButton(Context context) {
         this(context, null);
@@ -385,43 +388,6 @@ public class TouchSwitchButton extends RelativeLayout {
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void playLeftPointOneAni() {
-        LeftPointOneAnimSet = new AnimatorSet();
-        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(mIvLeftPointOne, "scaleY", 1.0f, 1.75f);
-        scaleYAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        scaleYAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        scaleYAnimator.setDuration(650);
-        scaleYAnimator.setInterpolator(new PathInterpolator(0.35f, 0.0f, 0.2f, 1f));
-
-        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(mIvLeftPointOne, "scaleX", 1.0f, 1.75f);
-        scaleXAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        scaleXAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        scaleXAnimator.setDuration(650);
-        scaleXAnimator.setInterpolator(new PathInterpolator(0.35f, 0.0f, 0.2f, 1f));
-
-        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(mIvLeftPointOne, "alpha", 0f, 1f);
-        alphaAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        alphaAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        alphaAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float animatedValue = (float) animation.getAnimatedValue();
-                Log.d(TAG, "onAnimationUpdate: animatedValue = "+animatedValue);
-            }
-        });
-        alphaAnimator.setDuration(650);
-        alphaAnimator.setInterpolator(new PathInterpolator(0.35f, 0.0f, 0.2f, 1f));
-
-        ObjectAnimator translationXAnimator = ObjectAnimator.ofFloat(mIvLeftPointOne, "translationX",
-                0,  dip2px(getContext(),-110));
-        translationXAnimator.setDuration(1300);
-        translationXAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        translationXAnimator.setRepeatMode(ValueAnimator.RESTART);
-        translationXAnimator.setInterpolator(new PathInterpolator(0.3f, 0.0f, 0.4f, 1f));
-
-        LeftPointOneAnimSet.play(scaleYAnimator).with(scaleXAnimator).with(alphaAnimator).with(translationXAnimator);
-        LeftPointOneAnimSet.start();
-    }
 
     public interface OnActionSelectedListener {
         int onSelected();
@@ -443,9 +409,11 @@ public class TouchSwitchButton extends RelativeLayout {
         postDelayed(new Runnable() {
             @Override
             public void run() {
-                mTouchZoomOutScaleY = ObjectAnimator.ofFloat(thumbView, "scaleY", touchZoomValue, 1.0f).setDuration(touchZoomTime);
+                mTouchZoomOutScaleY = ObjectAnimator.ofFloat(thumbView, "scaleY",
+                        touchZoomValue, 1.0f).setDuration(touchZoomTime);
                 mTouchZoomOutScaleY.start();
-                mTouchZoomOutScaleX = ObjectAnimator.ofFloat(thumbView, "scaleX", touchZoomValue, 1.0f).setDuration(touchZoomTime);
+                mTouchZoomOutScaleX = ObjectAnimator.ofFloat(thumbView, "scaleX",
+                        touchZoomValue, 1.0f).setDuration(touchZoomTime);
                 mTouchZoomOutScaleX.start();
 
                 ValueAnimator animation = ValueAnimator.ofFloat(touchZoomValue, 1.0f).setDuration(touchZoomTime);
@@ -486,7 +454,6 @@ public class TouchSwitchButton extends RelativeLayout {
                     return true;
                 case MotionEvent.ACTION_UP:
                     playPointAni();
-                    //
                     touchZoomOut(mTouchZoomValue, mTouchZoomTime);
                     requestDisallowInterceptTouchEvent(false);
                     delta = event.getRawX() - initialTouchX;
@@ -561,6 +528,10 @@ public class TouchSwitchButton extends RelativeLayout {
 
 
     private void playPointAni(){
+        if (mAlphaAnimatorSet != null) {
+            mAlphaAnimatorSet.cancel();
+        }
+
         mIvCenterPoint.setVisibility(VISIBLE);
         mIvLeftPointOne.setVisibility(VISIBLE);
         mIvLeftPointTwo.setVisibility(VISIBLE);
@@ -574,11 +545,56 @@ public class TouchSwitchButton extends RelativeLayout {
         playLeftPointAni(mIvRightPointTwo,110,200);
     }
 
+
+
+    private ObjectAnimator getAlphaAnimator(View iv, long startDelay,long duration,float... values){
+        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(iv, "alpha", values);
+        alphaAnimator.setDuration(duration);
+        alphaAnimator.setStartDelay(startDelay);
+        return alphaAnimator;
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void cancelAniSet() {
+        mAlphaAnimatorSet = new AnimatorSet();
+        mAlphaAnimatorSet.playTogether(getAlphaAnimator(mIvCenterPoint, 0, 100,1.0f, 0.0f),
+                getAlphaAnimator(mIvLeftPointOne, 0, 100,1.0f, 0.0f),
+                getAlphaAnimator(mIvLeftPointTwo, 0, 100,1.0f, 0.0f),
+                getAlphaAnimator(mIvRightPointOne, 0, 100,1.0f, 0.0f),
+                getAlphaAnimator(mIvRightPointTwo, 0,100, 1.0f, 0.0f));
+        mAlphaAnimatorSet.setInterpolator(new PathInterpolator(0.35f, 0.0f, 0.2f, 1f));
+        mAlphaAnimatorSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                resetPointAni();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                resetPointAni();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        mAlphaAnimatorSet.start();
+    }
+
+    private void resetPointAni() {
         for (AnimatorSet leftRightAnimSet : mLeftRightAnimSets) {
             leftRightAnimSet.cancel();
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 触发条件：下击
         mCenterPointAnimSet.cancel();
 
         mIvCenterPoint.setVisibility(GONE);
@@ -608,38 +624,52 @@ public class TouchSwitchButton extends RelativeLayout {
     /**
      * 点击放大的动画
      */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void touchZoom() {
-        if (mTouchZoomOutScaleY != null) {
-            mTouchZoomOutScaleY.cancel();
+        if (mTouchZoomAnimatorSet != null) {
+            mTouchZoomAnimatorSet.cancel();
         }
-        if (mTouchZoomOutScaleX != null) {
-            mTouchZoomOutScaleX.cancel();
-        }
+        final int duration = 100;
+        final float startValue = 1.0f;
+        final float endValue = 1.25f;
         postDelayed(new Runnable() {
+
+
             @Override
             public void run() {
-                mTouchZoomScaleY = ObjectAnimator.ofFloat(thumbView, "scaleY", 1.0f, 1.2f).setDuration(200);
-                mTouchZoomScaleY.start();
-                mTouchZoomScaleX = ObjectAnimator.ofFloat(thumbView, "scaleX", 1.0f, 1.2f).setDuration(200);
-                mTouchZoomScaleX.start();
+                mTouchZoomAnimatorSet = new AnimatorSet();
+                ObjectAnimator touchZoomScaleY = ObjectAnimator.ofFloat(thumbView, "scaleY", startValue, endValue).setDuration(duration);
+                ObjectAnimator touchZoomScaleX = ObjectAnimator.ofFloat(thumbView, "scaleX", startValue, endValue).setDuration(duration);
+                ObjectAnimator alphaAnimator = getAlphaAnimator(thumbView, 0, 100, 0.4f, 1f);
+                mTouchZoomAnimatorSet.playTogether(touchZoomScaleY,touchZoomScaleX,alphaAnimator);
+                mTouchZoomAnimatorSet.setInterpolator(new PathInterpolator(0.35f,0f,0.2f,1f));
 
-                ValueAnimator animation = ValueAnimator.ofFloat(1.0f, 1.2f).setDuration(200);
-                animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                ValueAnimator scaleAnimation = ValueAnimator.ofFloat(startValue, endValue).setDuration(duration);
+                scaleAnimation.setInterpolator(new PathInterpolator(0.35f,0f,0.2f,1f));
+                scaleAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
                         float animatedValue = (float) animation.getAnimatedValue();
-                        float offset = (animatedValue - 1.0f) / (1.2f - 1.0f);
-                        long touchZoomTime = (long) (offset * 200);
-                        int currentColor = (int) new ArgbEvaluator().evaluate(offset,
-                                getResources().getColor(R.color.ts_transparent_white), Color.WHITE);
-                        ((RingView) thumbView).getPaint().setColor(currentColor);
-                        ((RingView) thumbView).invalidate();
-
-                        mTouchZoomTime = touchZoomTime;
+                        float offset = (animatedValue - startValue) / (endValue - startValue);
+                        long touchZoomTime = (long) (offset * duration);
                         mTouchZoomValue = animatedValue;
+                        mTouchZoomTime = touchZoomTime;
                     }
                 });
-                animation.start();
+                scaleAnimation.start();
+
+                ValueAnimator alphaValueAnimator = ValueAnimator.ofFloat(0.4f, 1f).setDuration(100);
+                alphaValueAnimator.setInterpolator(new PathInterpolator(0.35f,0f,0.2f,1f));
+                scaleAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        //TODO 松手 上次的透明度
+                        float animatedValue = (float) animation.getAnimatedValue();
+                    }
+                });
+                alphaValueAnimator.start();
+
+                mTouchZoomAnimatorSet.start();
             }
         }, 0);
     }

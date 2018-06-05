@@ -15,13 +15,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 27
     buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "com.benny.app.sample"
         minSdkVersion 17
-        targetSdkVersion 23
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
@@ -50,4 +50,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
 
     compile 'com.android.support.constraint:constraint-layout:1.1.0'
+
+    debugCompile 'me.ele:uetool:1.0.15'
+    releaseCompile 'me.ele:uetool-no-op:1.0.15'
 }
