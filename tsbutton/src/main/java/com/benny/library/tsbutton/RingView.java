@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 
 /**
  * Created by lixiao on 2017/9/4 09:13.
@@ -17,7 +16,7 @@ public class RingView extends View {
 
     private Paint mPaint;
     private final float ring_width;
-    private int ring_color;
+    private int ringColor;
     private final TypedArray array;
 
     public RingView(Context context, AttributeSet attrs) {
@@ -26,40 +25,20 @@ public class RingView extends View {
         array = context.obtainStyledAttributes(attrs, R.styleable.RingView);
         //取出属性
         ring_width = array.getDimension(R.styleable.RingView_ring_width, 5);
-        ring_color = array.getColor(R.styleable.RingView_ring_color, Color.BLACK);
+        ringColor = array.getColor(R.styleable.RingView_ring_color, Color.BLACK);
         //最后需要将TypedArray对象回收
         array.recycle();
-
-        View v = View.inflate(context, R.layout.item, null);
-        Button btnChangeColor = (Button) v.findViewById(R.id.btn_change_color);
-        btnChangeColor.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setColor();
-            }
-        });
 
         initPaint();
     }
 
     private void initPaint() {
         mPaint = new Paint();
-        mPaint.setAntiAlias(true); //设置抗锯齿的效果
-        mPaint.setStyle(Paint.Style.STROKE); //设置画笔样式为描边
-        mPaint.setStrokeWidth(ring_width);  //设置笔刷的粗细度
-        mPaint.setColor(ring_color); //设置画笔的颜色
+        mPaint.setAntiAlias(true);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(ring_width);
+        mPaint.setColor(ringColor);
     }
-
-    private void setColor() {
-        if (ring_color == Color.BLACK) {
-            int color = array.getColor(R.styleable.RingView_ring_color, Color.RED);
-            ring_color = color;
-        } else if (ring_color == Color.RED) {
-            int color = array.getColor(R.styleable.RingView_ring_color, Color.BLACK);
-            ring_color = color;
-        }
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
@@ -81,13 +60,6 @@ public class RingView extends View {
         return mPaint;
     }
 
-    /**
-     * 改变颜色
-     */
-    public void changeColor() {
-
-        invalidate();
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {

@@ -9,10 +9,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -20,7 +17,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.PathInterpolator;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -43,26 +39,15 @@ public class TouchSwitchButton extends RelativeLayout {
 
     private Drawable mThumb;
     private int thumbId;
-    private int startColor;
-    private int toLeftEndColor;
-    private int toRightEndColor;
-    private float radius;
     private int direction = TWO_WAY;
-    private ObjectAnimator mTouchZoomScaleY;
-    private ObjectAnimator mTouchZoomScaleX;
-    private ObjectAnimator mTouchZoomOutScaleY;
-    private ObjectAnimator mTouchZoomOutScaleX;
 
     private float mTouchZoomValue = 1.25f;
     private long mTouchZoomTime = 100;
     private ImageView mImageViewLeft;
     private ImageView mImageViewRight;
-    private int mImageViewRightWidth;
-    private int mImageViewLeftWidth;
     private ImageView mIvCenterPoint;
     private AnimatorSet mCenterPointAnimSet;
     private ImageView mIvLeftPointOne;
-    private AnimatorSet LeftPointOneAnimSet;
     private ImageView mIvLeftPointTwo;
     private List<AnimatorSet> mLeftRightAnimSets = new ArrayList<>();
     private ImageView mIvRightPointOne;
@@ -102,32 +87,11 @@ public class TouchSwitchButton extends RelativeLayout {
         mThumb = t.getDrawable(R.styleable.TouchSwitchButton_tsb_thumb);
         thumbId = t.getResourceId(R.styleable.TouchSwitchButton_tsb_thumbId, 0);
         direction = t.getInt(R.styleable.TouchSwitchButton_tsb_direction, TWO_WAY);
-        startColor = t.getColor(R.styleable.TouchSwitchButton_tsb_startColor, Color.TRANSPARENT);
-        toLeftEndColor = t.getColor(R.styleable.TouchSwitchButton_tsb_toLeftEndColor, Color.TRANSPARENT);
-        toRightEndColor = t.getColor(R.styleable.TouchSwitchButton_tsb_toRightEndColor, Color.TRANSPARENT);
-        radius = t.getDimension(R.styleable.TouchSwitchButton_tsb_radius, 10000);
         t.recycle();
     }
 
-    private Drawable createBackground() {
-        if (getBackground() == null) {
-            //if not set background in layout xml, than create default round rect background
-            float[] outerRadii = {radius, radius, radius, radius, radius, radius, radius, radius};
-            RoundRectShape roundRectShape = new RoundRectShape(outerRadii, null, null);
-            ShapeDrawable drawable = new ShapeDrawable(roundRectShape);
-            drawable.getPaint().setColor(startColor);
-            drawable.getPaint().setStyle(Paint.Style.FILL);
-            return drawable;
-        }
-        return getBackground();
-    }
 
     private void initView() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            setBackground(createBackground());
-        } else {
-            setBackgroundDrawable(createBackground());
-        }
         setLeftImage(R.drawable.ts_hangup);
         setRightImage(R.drawable.ts_answer);
         mIvLeftPointOne = getPoint(R.drawable.ts_left_point_one);
@@ -135,7 +99,6 @@ public class TouchSwitchButton extends RelativeLayout {
         mIvCenterPoint = getPoint(R.drawable.ts_center_point);
         mIvRightPointOne = getPoint(R.drawable.ts_right_point_one);
         mIvRightPointTwo = getPoint(R.drawable.ts_right_point_two);
-        //TODO
         playPointAni();
     }
 
@@ -250,32 +213,17 @@ public class TouchSwitchButton extends RelativeLayout {
         return getWidth() - getPaddingRight() - getPaddingLeft() - thumbView.getWidth();
     }
 
-    float getOffsetPercentage(float delta) {
-        double percent;
-        switch (direction) {
-            case TWO_WAY:
-                percent = Math.abs(delta) / (0.5 * getThumbMaxPosition());
-                break;
-            default:
-                percent = Math.abs(delta) / getThumbMaxPosition();
-        }
-        float offset = (float) (percent > 1 ? 1f : percent);
-        return offset;
-    }
-
     float getOffsetSacles(float delta) {
         float newdelta = (Math.abs(delta) -dip2px(getContext(),70))/2;
         double percent;
         percent =  newdelta/(129 - 70);
-        float offset = (float) (percent > 1 ? 1f : percent);
-        return offset;
+        return (float) (percent > 1 ? 1f : percent);
     }
 
     float getOffsetOneFourthPercentage(float delta) {
         double percent;
         percent = Math.abs(delta) / (0.25 * getThumbMaxPosition());
-        float offset = (float) (percent > 1 ? 1f : percent);
-        return offset;
+        return (float) (percent > 1 ? 1f : percent);
     }
 
 
@@ -337,11 +285,6 @@ public class TouchSwitchButton extends RelativeLayout {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         thumbView.setTranslationX(getThumbInitialPosition());
-
-        mImageViewRightWidth = mImageViewRight.getMeasuredWidth();
-        mImageViewLeftWidth = mImageViewLeft.getMeasuredWidth();
-
-
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -413,6 +356,10 @@ public class TouchSwitchButton extends RelativeLayout {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 
     public interface OnActionSelectedListener {
+        /**
+         * 被选择
+         * @return
+         */
         int onSelected();
     }
 
@@ -677,11 +624,7 @@ public class TouchSwitchButton extends RelativeLayout {
         mTouchZoomScaleValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                float animatedValue = (float) animation.getAnimatedValue();
-//                float offset = (animatedValue - startValue) / (endValue - startValue);
-//                long touchZoomTime = (long) (offset * duration);
-//                mTouchZoomTime = touchZoomTime;
-                mTouchZoomValue = animatedValue;
+                mTouchZoomValue = (float) animation.getAnimatedValue();
             }
         });
         mTouchZoomScaleValueAnimator.start();

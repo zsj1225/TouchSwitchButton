@@ -1,7 +1,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -23,10 +23,7 @@
         android:layout_height="50dp"
         android:padding="5dp"
         app:tsb_direction="ToRight"
-        app:tsb_radius="10000dp"
-        app:tsb_startColor="@android:color/holo_purple"
-        app:tsb_thumb="@drawable/bg_circle_red"
-        app:tsb_toRightEndColor="@android:color/holo_orange_light" />
+        />
 
     <TextView
         android:visibility="gone"
@@ -43,10 +40,7 @@
         android:layout_height="50dp"
         android:padding="5dp"
         app:tsb_direction="ToLeft"
-        app:tsb_radius="10000dp"
-        app:tsb_startColor="#19eef5"
-        app:tsb_thumb="@drawable/bg_circle_red"
-        app:tsb_toLeftEndColor="@android:color/holo_orange_light" />
+        />
 
     <TextView
         android:visibility="gone"
@@ -62,10 +56,8 @@
         android:layout_width="match_parent"
         android:layout_height="94dp"
         app:tsb_direction="TwoWay"
-        app:tsb_radius="10000dp"
         app:tsb_thumbId="@+id/thumb"
-        app:tsb_toLeftEndColor="@android:color/holo_green_light"
-        app:tsb_toRightEndColor="@android:color/holo_orange_light">
+        >
 
 
         <com.benny.library.tsbutton.RingView

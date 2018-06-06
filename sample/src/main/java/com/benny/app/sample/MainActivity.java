@@ -1,14 +1,9 @@
 package com.benny.app.sample;
 
-import android.animation.ObjectAnimator;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.animation.PathInterpolator;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.benny.library.tsbutton.TouchSwitchButton;
@@ -32,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
             return 500;
         }
     };
-    private ImageView mTsCenterPoint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
