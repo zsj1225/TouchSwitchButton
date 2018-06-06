@@ -135,6 +135,7 @@ public class TouchSwitchButton extends RelativeLayout {
         mIvCenterPoint = getPoint(R.drawable.ts_center_point);
         mIvRightPointOne = getPoint(R.drawable.ts_right_point_one);
         mIvRightPointTwo = getPoint(R.drawable.ts_right_point_two);
+        //TODO
         playPointAni();
     }
 
@@ -155,11 +156,14 @@ public class TouchSwitchButton extends RelativeLayout {
         }
         mImageViewRight = new ImageView(getContext());
         mImageViewRight.setImageResource(resId);
-        RelativeLayout.LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.rightMargin = dip2px(getContext(), 34);
+        RelativeLayout.LayoutParams layoutParams = new LayoutParams(dip2px(getContext(),62),
+                dip2px(getContext(),62));
+        layoutParams.rightMargin = dip2px(getContext(), 34-16);
         layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        //规避svg放大模糊
+        mImageViewRight.setScaleY(0.5f);
+        mImageViewRight.setScaleX(0.5f);
         addView(mImageViewRight, layoutParams);
     }
 
@@ -169,13 +173,14 @@ public class TouchSwitchButton extends RelativeLayout {
         }
         mImageViewLeft = new ImageView(getContext());
         mImageViewLeft.setImageResource(resID);
-        RelativeLayout.LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.leftMargin = dip2px(getContext(), 34);
+        RelativeLayout.LayoutParams layoutParams = new LayoutParams(dip2px(getContext(),62),
+                dip2px(getContext(),62));
+        layoutParams.leftMargin = dip2px(getContext(), 34-16);
         layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+        mImageViewLeft.setScaleY(0.5f);
+        mImageViewLeft.setScaleX(0.5f);
         addView(mImageViewLeft, layoutParams);
     }
-
 
     /**
      * dp转px
@@ -275,7 +280,7 @@ public class TouchSwitchButton extends RelativeLayout {
 
 
     public void changeColor(float delta, int startColor) {
-        float offset =getOffsetSacles(delta);
+        float offset =getOffsetSacles(delta)/2;
         if (offset < 0) {
             offset = 0;
         }
@@ -284,11 +289,11 @@ public class TouchSwitchButton extends RelativeLayout {
         }
 
         if (delta > 0) {
-            mImageViewRight.setScaleX(1 + offset);
-            mImageViewRight.setScaleY(1 + offset);
+            mImageViewRight.setScaleX(0.5f + offset);
+            mImageViewRight.setScaleY(0.5f + offset);
         } else {
-            mImageViewLeft.setScaleX(1 + offset);
-            mImageViewLeft.setScaleY(1 + offset);
+            mImageViewLeft.setScaleX(0.5f + offset);
+            mImageViewLeft.setScaleY(0.5f + offset);
         }
         int currentColor = (int) new ArgbEvaluator().evaluate(getOffsetOneFourthPercentage(delta), startColor,
                 delta > 0 ? getResources().getColor(R.color.ts_call_right) :
@@ -460,6 +465,7 @@ public class TouchSwitchButton extends RelativeLayout {
                     cancelAniSet();
                     return true;
                 case MotionEvent.ACTION_UP:
+                    //TODO
                     playPointAni();
 
                     requestDisallowInterceptTouchEvent(false);
@@ -473,6 +479,7 @@ public class TouchSwitchButton extends RelativeLayout {
                         targetX = getThumbMaxPosition();
                     }
 
+                    Log.d(TAG, "onTouch: targetX="+targetX);
                     if (targetX < THRESHOLD && direction != TO_RIGHT) {
                         if (onToLeftSelectedListener != null) {
                             onToLeftSelectedListener.onSelected();
@@ -518,9 +525,9 @@ public class TouchSwitchButton extends RelativeLayout {
         }
 
         private void restoreState(final float delta) {
-            ObjectAnimator.ofFloat(thumbView, "translationX", getThumbPosition(), initialX).setDuration(200).start();
+            ObjectAnimator.ofFloat(thumbView, "translationX", getThumbPosition(), initialX).setDuration(100).start();
 
-            ValueAnimator animation = ValueAnimator.ofFloat(delta, 0).setDuration(200);
+            ValueAnimator animation = ValueAnimator.ofFloat(delta, 0).setDuration(100);
             animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
